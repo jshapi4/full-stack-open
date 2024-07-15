@@ -1,13 +1,34 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import axios from "axios";
+import personService from "./services/personService";
 
-const Persons = ({ filteredPersons }) => {
+const Footer = () => {
+  const footerStyle = {
+    color: "grey",
+    fontStyle: "italic",
+    fontSize: 16,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: "2.5rem",
+  };
+  return (
+    <div style={footerStyle}>
+      <br />
+      <em>Phonebook app, JShap 2024</em>
+    </div>
+  );
+};
+
+const Persons = ({ filteredPersons, handleDelete }) => {
   return (
     <div>
       {filteredPersons.map((person) => (
         <div key={person.id}>
           {person.name}: {person.phone}
+          <button onClick={() => handleDelete(person.id, person.name)}>
+            delete
+          </button>
         </div>
       ))}
     </div>
@@ -49,6 +70,15 @@ const PersonForm = ({
   );
 };
 
+const Notification = ({ successMessage, errorMessage }) => {
+  return (
+    <>
+      {successMessage && <div className="success">{successMessage}</div>}
+      {errorMessage && <div className="error">{errorMessage}</div>}
+    </>
+  );
+};
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", phone: "040-123456", id: 1 },
@@ -59,12 +89,14 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     console.log("effect");
-    axios.get("http://localhost:3002/persons").then((response) => {
+    personService.getAll().then((initialPersons) => {
       console.log("promise fulfilled");
-      setPersons(response.data);
+      setPersons(initialPersons);
     });
   }, []);
 
@@ -75,9 +107,40 @@ const App = () => {
     const numberExists = persons.some((person) => person.number === newNumber);
 
     if (nameExists) {
-      alert(`${newName} already is in the phonebook!`);
+      if (
+        window.confirm(
+          `${newName} already is in the phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const personToUpdate = persons.find(
+          (person) => person.name === newName
+        );
+        const updatedPerson = { ...personToUpdate, phone: newNumber };
+        console.log(personToUpdate);
+        console.log(updatedPerson);
+        personService
+          .update(personToUpdate.id, updatedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== personToUpdate.id ? person : returnedPerson
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+            setSuccessMessage(
+              `Updated ${returnedPerson.name}'s number successfully.`
+            );
+            setTimeout(() => setSuccessMessage(""), 5000);
+          })
+          .catch((error) => {
+            console.error("Failed to update person:", error);
+          });
+      }
       return;
-    } else if (!newName) {
+    }
+
+    if (!newName) {
       alert("Please enter a name");
       return;
     }
@@ -95,12 +158,23 @@ const App = () => {
     const personObject = {
       name: newName,
       phone: newNumber,
-      id: String(persons.length + 1),
+      //id: String(persons.length + 1), //let the server assign an id
     };
 
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
+    personService
+      .create(personObject)
+      .then((newPerson) => {
+        setPersons(persons.concat(newPerson));
+        setNewName("");
+        setNewNumber("");
+        setSuccessMessage(`Added ${newPerson.name} successfully.`);
+        setTimeout(() => setSuccessMessage(""), 5000);
+      })
+      .catch((error) => {
+        console.log("failed to add person:", error);
+        setErrorMessage(`Failed to add ${newName}`);
+        setTimeout(() => setErrorMessage(""), 5000);
+      });
   };
 
   const handleName = (event) => {
@@ -111,6 +185,25 @@ const App = () => {
   const handleNumber = (event) => {
     const newNumberInputted = event.target.value;
     setNewNumber(newNumberInputted);
+  };
+
+  const handleDelete = (id, name) => {
+    console.log(id, name);
+    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
+      personService
+        .del(id)
+        .then(() => {
+          setPersons(persons.filter((person) => person.id !== id));
+        })
+        .catch((error) => {
+          setErrorMessage(
+            `Failed to delete ${name} from the phonebook. Information has already been removed from the server. Error: ${error}`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
+    }
   };
 
   const handleSearch = (event) => {
@@ -126,6 +219,10 @@ const App = () => {
     <div>
       <h2>Search the Phonebook</h2>
       <Filter search={search} handleSearch={handleSearch} />
+      <Notification
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+      />
       <PersonForm
         addPerson={addPerson}
         newName={newName}
@@ -134,7 +231,8 @@ const App = () => {
         handleNumber={handleNumber}
       />
       <h2>Phonebook</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons filteredPersons={filteredPersons} handleDelete={handleDelete} />
+      <Footer />
     </div>
   );
 };
