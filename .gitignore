@@ -1,0 +1,4 @@
+.DS_Store
+node_modules/
+part3/notes_backend/node_modules
+part3/part2-notes-frontend.git
