@@ -81,10 +81,10 @@ const Notification = ({ successMessage, errorMessage }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: "Arto Hellas", phone: "040-123456", id: 1 },
-    { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", phone: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", phone: "39-23-6423122", id: 4 },
+    // { name: "Arto Hellas", phone: "040-123456", id: 1 },
+    // { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
+    // { name: "Dan Abramov", phone: "12-43-234345", id: 3 },
+    // { name: "Mary Poppendieck", phone: "39-23-6423122", id: 4 },
   ]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
@@ -158,7 +158,6 @@ const App = () => {
     const personObject = {
       name: newName,
       phone: newNumber,
-      //id: String(persons.length + 1), //let the server assign an id
     };
 
     personService
@@ -171,8 +170,9 @@ const App = () => {
         setTimeout(() => setSuccessMessage(""), 5000);
       })
       .catch((error) => {
-        console.log("failed to add person:", error);
-        setErrorMessage(`Failed to add ${newName}`);
+        console.log("failed to add person:", error.response.data.error);
+        setErrorMessage(error.response.data.error);
+        //`Failed to add ${newName}`,
         setTimeout(() => setErrorMessage(""), 5000);
       });
   };
