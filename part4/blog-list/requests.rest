@@ -2,8 +2,22 @@ POST http://localhost:3004/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Example Title 2",
-    "author": "Example Author 2",
-    "url": "http://www.example.com/2",
-    "likes": 100
+    "title": "Ex Title 3",
+    "author": "Ex Author 3",
+    "url": "http://www.example.com/34",
+    "likes": 2940
+}
+
+###
+GET http://localhost:3004/api/blogs/66b41c0b99c5bd8a42926f5d
+
+###
+PUT http://localhost:3004/api/blogs/66b41c0b99c5bd8a42926f5d
+Content-Type: application/json
+
+{
+    "title": "Ex Title AMENDED",
+    "author": "Ex Author EDITED",
+    "url": "http://www.exampleedit.com/34",
+    "likes": 2941
 }
