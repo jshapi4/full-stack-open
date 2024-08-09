@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const dummy = (blogs) => {
   return 1
 }
@@ -24,8 +26,43 @@ function findMostLikedBlog(blogs) {
   return mostLikedBlog
 }
 
+function mostBlogsByAuthor(blogs) {
+  // find the blog count for each author
+  const authorCounts = _.countBy(blogs, 'author')
+
+  // find author with most blogs using lodash function maxBy
+  const topAuthor = _.maxBy(Object.keys(authorCounts), (author) => authorCounts[author])
+
+  return {
+    author: topAuthor,
+    blogs: authorCounts[topAuthor],
+  }
+}
+
+function mostLikedAuthor(blogs) {
+  // find the like count for each author
+  const authorLikes = blogs.reduce((acc, blog) => {
+    if (acc[blog.author]) {
+      acc[blog.author] += blog.likes
+    } else {
+      acc[blog.author] = blog.likes
+    }
+    return acc
+  }, {})
+
+  // find author with most blogs using lodash function maxBy
+  const mostLiked = _.maxBy(Object.keys(authorLikes), (author) => authorLikes[author])
+
+  return {
+    author: mostLiked,
+    likes: authorLikes[mostLiked],
+  }
+}
+
 module.exports = {
   dummy,
   totalLikes,
   findMostLikedBlog,
+  mostBlogsByAuthor,
+  mostLikedAuthor,
 }
