@@ -2,10 +2,10 @@ POST http://localhost:3004/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Ex Title 3",
-    "author": "Ex Author 3",
-    "url": "http://www.example.com/34",
-    "likes": 2940
+    "title": "An Old Day",
+    "author": "Arthur The Ardvark",
+    "url": "http://www.YATND.com/example",
+    "likes": 3
 }
 
 ###
