@@ -8,21 +8,6 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-const initialBlogs = [
-  {
-    title: 'The End of The World As We Know It',
-    author: 'The Man',
-    url: 'www.example.com/eoftwawki2',
-    likes: 23,
-  },
-  {
-    title: 'In The Beginning',
-    author: 'G-d',
-    url: 'www.example.com/theword',
-    likes: 12003,
-  },
-]
-
 beforeEach(async () => {
   await Blog.deleteMany({})
 
@@ -39,12 +24,23 @@ test('blogs are returned as json', async () => {
     .expect('Content-Type', /application\/json/)
 })
 
-// exercse 4.8 verify the blog list application returns the correct amount of blog posts in the JSON format
+// exercise 4.8 verify the blog list application returns the correct amount of blog posts in the JSON format
 
 test('correct amount of blog posts are returned', async () => {
   const response = await api.get('/api/blogs')
 
   assert.strictEqual(response.body.length, helper.initialBlogs.length)
+})
+
+// exercise 4.9: verify that the unique identifier is named ID
+
+test('unique identifier is named id', async () => {
+  const response = await api.get('/api/blogs')
+
+  const blogs = response.body
+  blogs.forEach((blog) => {
+    assert(blog.id, 'id field is missing')
+  })
 })
 
 test('there are two blogs', async () => {
