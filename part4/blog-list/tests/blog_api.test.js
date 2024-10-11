@@ -51,7 +51,7 @@ test('there are two blogs', async () => {
 
 test('a valid blog can be added ', async () => {
   const newBlog = {
-    title: 'Test Title',
+    title: 'Test Verification',
     author: 'Test Author',
     url: 'www.test.com',
     likes: 42,
@@ -66,7 +66,7 @@ test('a valid blog can be added ', async () => {
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
   const titles = blogsAtEnd.map((b) => b.title)
-  assert(titles.includes('Test Title'))
+  assert(titles.includes('Test Verification'))
 })
 
 test('a specific blog can be viewed', async () => {
