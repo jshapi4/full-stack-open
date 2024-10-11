@@ -91,6 +91,30 @@ test('verify the likes property will default to 0 if not defined', async () => {
   assert.strictEqual(resultBlog.body.likes, 0)
 })
 
+// exercise 4.12: verify that if the title or url properties are missing, backend will respond with 400 code"
+
+test('verify that if the title or url properties are missing, backend will respond with 400', async () => {
+  const blogWithoutTitle = {
+    author: 'No Title Man',
+    url: 'www.notitle.com',
+    likes: 1000000,
+  }
+
+  const blogWithoutUrl = {
+    title: 'I Do Not Have A URL',
+    author: 'Link Larkin',
+    likes: 1452,
+  }
+
+  const response1 = await api.post('/api/blogs').send(blogWithoutTitle).expect(400)
+
+  assert.strictEqual(response1.status, 400)
+
+  const response2 = await api.post('/api/blogs').send(blogWithoutUrl).expect(400)
+
+  assert.strictEqual(response2.status, 400)
+})
+
 test('a specific blog can be viewed', async () => {
   const blogsAtStart = await helper.blogsInDb()
 
