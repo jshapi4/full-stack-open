@@ -109,10 +109,18 @@ test('verify that if the title or url properties are missing, backend will respo
   const response1 = await api.post('/api/blogs').send(blogWithoutTitle).expect(400)
 
   assert.strictEqual(response1.status, 400)
+  assert(
+    response1.body.error.includes('`title` and `url` are required'),
+    'Missing error message for missing title',
+  )
 
   const response2 = await api.post('/api/blogs').send(blogWithoutUrl).expect(400)
 
   assert.strictEqual(response2.status, 400)
+  assert(
+    response2.body.error.includes('`title` and `url` are required'),
+    'Missing error message for missing url',
+  )
 })
 
 test('a specific blog can be viewed', async () => {
