@@ -69,6 +69,28 @@ test('a valid blog can be added ', async () => {
   assert(titles.includes('Test Verification'))
 })
 
+// Exercise 4.11 - Verify if the likes property is missing, will default to 0
+test('verify the likes property will default to 0 if not defined', async () => {
+  const blogWithoutLikesDefined = {
+    title: 'Blog Without Likes',
+    author: 'Zero Likes',
+    url: 'www.nobodylikesme.com',
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(blogWithoutLikesDefined)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const resultBlog = await api
+    .get(`/api/blogs/${response.body.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(resultBlog.body.likes, 0)
+})
+
 test('a specific blog can be viewed', async () => {
   const blogsAtStart = await helper.blogsInDb()
 
