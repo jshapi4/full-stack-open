@@ -135,11 +135,11 @@ test('a specific blog can be viewed', async () => {
   assert.deepStrictEqual(resultBlog.body, blogToView)
 })
 
-test('a specific blog can be deleted', async () => {
+// Exercise 4.13: delete a single blog post
+test('a single blog post can be deleted', async () => {
   const blogsAtStart = await helper.blogsInDb()
 
-  const blogToDelete = blogsAtStart[0]
-  console.log(blogToDelete)
+  const blogToDelete = blogsAtStart[1]
 
   await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 
@@ -150,6 +150,29 @@ test('a specific blog can be deleted', async () => {
   assert(!titles.includes(blogToDelete.title))
 
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+// Exercise 4.14: An individual blog post can be updated
+test('a blog post number of likes can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+
+  const blogToUpdate = blogsAtStart[0]
+
+  const updatedBlogInfo = {
+    title: blogToUpdate.title,
+    author: blogToUpdate.author,
+    url: blogToUpdate.url,
+    likes: blogToUpdate.likes + 1,
+  }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlogInfo)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const updatedBlog = response.body
+  assert.strictEqual(updatedBlog.likes, blogToUpdate.likes + 1)
 })
 
 after(async () => {
